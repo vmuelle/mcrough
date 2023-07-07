@@ -1,0 +1,38 @@
+Suchbegiffe:
+
+- iPPG --> Zaunseder
+- PPG
+- skin surface structure
+- stratum corneum
+- epidermis
+- monte carlo
+- skin texture
+- skin microstructure
+- morphology
+- optical
+- roughness
+- geometry
+- wrinkles
+
+--> PubMed
+--> Scholar
+
+
+
+Untersucht werden:
+ - Texture/Microstructure
+ - Positionierung von Source/Detector / iPPG
+Weitere Einflüsse:
+ - Age
+ - Melanin
+ - Skin Type and Location (Finger/Neck/...FACE)
+ - Skin Temperature
+ - Hair/Sweat
+ - Mechanical Properties/Elasticity/Streching 
+--> Skin Model Inga
+
+
+--> Just Surface Structure (e.g. std dev with roughness and random pattern with smoothing filter)
+
+https://www.sciencedirect.com/science/article/pii/S1751616119305533?via%3Dihub
+Maiti anschreiben wegen daten
