@@ -20,7 +20,7 @@ model.MC.lightSource.phi       = 0; % [rad] Azimuthal angle of direction the lig
 
 model.MC.useLightCollector        = true;
 model.MC.lightCollector.x         = 0; % [cm] x position of either the center of the objective lens focal plane or the fiber tip
-model.MC.lightCollector.y         = 0; % [cm] y position
+model.MC.lightCollector.y         = 0.17; % [cm] y position
 model.MC.lightCollector.z         = 0; % [cm] z position
 
 model.MC.lightCollector.theta     = 0; % [rad] Polar angle of direction the light collector is facing
@@ -42,8 +42,9 @@ model = plot(model,'MC');
 fluence = model.MC.normalizedFluenceRate(:,:,:);
 transmittance = model.MC.normalizedIrradiance_zpos;
 reflectance = model.MC.normalizedIrradiance_zneg;
+image = model.MC.lightCollector.image;
 name = strcat('ppg',string(winkel),'.mat');
-save(name,'fluence','transmittance','reflectance');
+save(name,'fluence','transmittance','reflectance','image');
 %MCmatlab.plotAzFz(model1);
 
 end

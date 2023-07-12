@@ -1,11 +1,11 @@
 spLIB = load('spectralLIBskin.mat');
 model1 = MCmatlab.model;
-model1.G.nx                = 200; % Number of bins in the x direction
-model1.G.ny                = 200; % Number of bins in the y direction
+model1.G.nx                = 400; % Number of bins in the x direction
+model1.G.ny                = 400; % Number of bins in the y direction
 %model1.G.nz                = 400; % Number of bins in the z direction
 model1.G.nz                = 1000;
-model1.G.Lx                = 1; % x size of simulation cuboid in cm
-model1.G.Ly                = 1; % y size of simulation cuboid in cm
+model1.G.Lx                = 0.5; % x size of simulation cuboid in cm
+model1.G.Ly                = 0.5; % y size of simulation cuboid in cm
 %model1.G.Lz                = 0.037; % z size of simulation cuboid in cm
 %model1.G.Lz                = 0.822;
 model1.G.Lz                = 0.53;
@@ -24,16 +24,17 @@ model1.G.geomFuncParams = {roughness_type};
 model1.G.mediaPropParams =  {spLIB,nm};
 
 model1.G.geomFunc          = @geometryDefinition; % Function to use for defining the distribution of media in the cuboid.
+%for roughness_type = 1:4
 for nm = 1:length(spLIB.nmLIB)
     model1.G.mediaPropertiesFunc = @mediaPropertiesFunc; % Media properties defined as a function at the end of this file
     
     model1 = plot(model1,'G');
     for winkel = 0:10:90
-        ppg(winkel,model1);
-        ippg(winkel,model1);
+        ppg(winkel,model1,roughness_type);
+        ippg(winkel,model1,roughness_type);
     end
 end
-
+%end
 %% Geometry function(s) (see readme for details)
 % A geometry function takes as input X,Y,Z matrices as returned by the
 % "ndgrid" MATLAB function as well as any parameters the user may have
@@ -54,11 +55,30 @@ function M = geometryDefinition(X,Y,Z,parameters)
 
     dimxy = size(X,1); 
     
+%     im1 = roughness(parameters{1},1,dimxy,zsurf*1e4);
+%     im2 = roughness(parameters{1},2,dimxy,zsurf*1e4+SC_thick*1e4);
+%     im3 = roughness(parameters{1},3,dimxy,zsurf*1e4+SC_thick*1e4+LE_thick*1e4);
+%     [X,Y] = meshgrid(0:0.5/400:0.5-(0.5/400),0:0.5/400:0.5-(0.5/400));
+%     X = X-0.25;
+%     Y = Y-0.25;
+% 
+%     figure
+%     mesh(X,Y,im1,'FaceColor','red','DisplayName','Oberfläche','EdgeColor',[0.7,0.7,0.7]);
+%     hold on
+%     mesh(X,Y,im2,'FaceColor','blue','DisplayName','SC-LE Übergang','EdgeColor',[0.7,0.7,0.7]);
+%     mesh(X,Y,im3,'FaceColor','green','DisplayName','LE-PD Übergang','EdgeColor',[0.7,0.7,0.7]);
+%     xlabel('X(cm)')
+%     ylabel('Y(cm)')
+%     zlabel('Z(cm)')
+%     legend()
+%     set(gca,'ZDir','reverse')
+%     hold off
+
     M = ones(size(X)); % air
     M(Z > roughness(parameters{1},1,dimxy,zsurf*1e4)) = 2; % stratum corneum
     M(Z > roughness(parameters{1},2,dimxy,zsurf*1e4+SC_thick*1e4)) = 3;
-    M(Z > roughness(parameters{1},3,dimxy,zsurf*1e4+SC_thick*1e4+LE_thick+1e4)) = 4;
-    M(Z > (zsurf+SC_thick+LE_thick+PD_thick+RD_thick)) = 5;
+    M(Z > roughness(parameters{1},3,dimxy,zsurf*1e4+SC_thick*1e4+LE_thick*1e4)) = 4;
+    M(Z > (zsurf+SC_thick+LE_thick+PD_thick)) = 5;
     M(Z > (zsurf+SC_thick+LE_thick+PD_thick+RD_thick)) = 6;
     M(Z > (zsurf+SC_thick+LE_thick+PD_thick+RD_thick+Hypo_thick)) = 7;
     M(Z > (zsurf+SC_thick+LE_thick+PD_thick+RD_thick+Hypo_thick+Muskel_thick)) = 8;
@@ -142,4 +162,5 @@ function mediaProperties = mediaPropertiesFunc(parameters)
   mediaProperties(j).mus   = lib.mus_knochen(i);  % Scattering coefficient in cm^-1
   mediaProperties(j).g     = lib.g_knochen(i);  % Henyey-Greenstein scattering anisotropy
   mediaProperties(j).n     = lib.n_knochen(i);  % Refractive index
+
 end

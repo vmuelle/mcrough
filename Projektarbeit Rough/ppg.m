@@ -1,4 +1,4 @@
-function ppg(winkel, model)
+function ppg(winkel, model,roughness_type)
 
 
 
@@ -43,7 +43,7 @@ fluence = model.MC.normalizedFluenceRate(:,:,:);
 transmittance = model.MC.normalizedIrradiance_zpos;
 reflectance = model.MC.normalizedIrradiance_zneg;
 image = model.MC.lightCollector.image;
-name = strcat('ppg',string(winkel),'.mat');
+name = strcat('outputs/ppg',string(winkel),'deg',string(model.MC.wavelength),'um',roughness_type,'.mat');
 save(name,'fluence','transmittance','reflectance','image');
 %MCmatlab.plotAzFz(model1);
 

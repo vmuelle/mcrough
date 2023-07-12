@@ -21,8 +21,8 @@ function im = roughness(type,intersection,dimxy,mean)
         im = im.*(std/s);
         im = im+mean;
         im = im.*10e-5;
-        figure 
-        mesh(im);
+        %figure 
+        %mesh(im);
 
     elseif (type == 2)%sulci cutis
         
@@ -33,20 +33,20 @@ function im = roughness(type,intersection,dimxy,mean)
 
         std = 3;
         im = zeros(dimxy,dimxy);
-        figure
+        %figure
         while(1)
         winkel = randsample(180,1);
         transly = randsample(400,1);
-        x = linspace(1,200,200);
+        x = linspace(1,dimxy,dimxy);
         y = tan((winkel*2*pi/360))*x+transly;
         y = cast(y,'int16');
         y(y<1) = 1;
-        y(y>200) = 200;
-        line = abs(normrnd(ra,rz,[1,dimxy]));
+        y(y>dimxy) = dimxy;
+        line = abs(normrnd(ra*5.7064,rz,[1,dimxy]));
         line(y==1) = 0;
-        line(y==200) = 0;
-        line(line >= rz) = rz;
-        for i = 1:200
+        line(y==dimxy) = 0;
+        %line(line >= rz) = rz;
+        for i = 1:dimxy
             if(im(x(i),y(i)) == 0)
                 im(x(i),y(i)) = im(x(i),y(i)) + line(i);
             else
@@ -54,7 +54,8 @@ function im = roughness(type,intersection,dimxy,mean)
             end
         end
         im2 = imgaussfilt(im,std,"FilterSize",[7,7]);
-        mesh(im2);
+        im2(im2>=rz) = rz;
+        %mesh(im2);
         ra_i = 1/(dimxy*dimxy) * sum(sum(im2));
         if (ra_i > ra)
             break;
@@ -62,6 +63,7 @@ function im = roughness(type,intersection,dimxy,mean)
         end
         RoughnessStore.setgetIm(im);
         im = imgaussfilt(im,std,"FilterSize",[7,7]);
+        im(im>=rz) = rz;
 
         elseif(intersection == 2)%sc-le
         %mean = 40;
@@ -70,7 +72,7 @@ function im = roughness(type,intersection,dimxy,mean)
         std = 3;
         im = RoughnessStore.setgetIm;
         im = imgaussfilt(im,std,"FilterSize",[7,7]);
-
+        im(im>=rz) = rz;
         elseif(intersection == 3)%le-pd
         %mean = 140;
         ra = 15.3;
@@ -79,6 +81,7 @@ function im = roughness(type,intersection,dimxy,mean)
         im = RoughnessStore.setgetIm;
         im = im.*(15.3/14.2); 
         im = imgaussfilt(im,std,"FilterSize",[9,9]);
+        im(im>=rz) = rz;
         end
         
         %s = std2(im);
@@ -110,7 +113,7 @@ function im = roughness(type,intersection,dimxy,mean)
         
         offsetx = randsample(20,1);
         offsety = randsample(20,1);
-        figure
+        %figure
         im1 = zeros(dimxy,dimxy);
         im2 = zeros(dimxy,dimxy);
         for x = 1:dimxy
@@ -122,8 +125,15 @@ function im = roughness(type,intersection,dimxy,mean)
             im2(:,y) = (A*sin(y_i*omegay+offsety));
         end
         im = im1.*im2;
+        im  = im./2;
         im = im+mean;
         im = im.*10e-5;
-        mesh(im);
+        %mesh(im);
+    elseif(type == 4)%flat
+        im = zeros(dimxy,dimxy);
+        im = im+mean;
+        im = im.*10e-5;
+        %figure
+        %mesh(im);
     end
 end
