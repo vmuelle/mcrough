@@ -24,17 +24,18 @@ model1.G.geomFuncParams = {roughness_type};
 model1.G.mediaPropParams =  {spLIB,nm};
 
 model1.G.geomFunc          = @geometryDefinition; % Function to use for defining the distribution of media in the cuboid.
-%for roughness_type = 1:4
+for roughness_type = 1:4
 for nm = 1:length(spLIB.nmLIB)
+    model1.MC.wavelength         = spLIB.nmLIB(nm); % Excitation wavelength in nm, used for determination of optical properties for excitation light
     model1.G.mediaPropertiesFunc = @mediaPropertiesFunc; % Media properties defined as a function at the end of this file
     
     model1 = plot(model1,'G');
-    for winkel = 0:10:90
+    for winkel = 0:5:45
         ppg(winkel,model1,roughness_type);
         ippg(winkel,model1,roughness_type);
     end
 end
-%end
+end
 %% Geometry function(s) (see readme for details)
 % A geometry function takes as input X,Y,Z matrices as returned by the
 % "ndgrid" MATLAB function as well as any parameters the user may have

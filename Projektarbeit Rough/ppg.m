@@ -33,7 +33,7 @@ model.MC.lightCollector.fieldSize = 0.136;%model.G.Lx; % [cm] Field Size of the 
 
 model.MC.lightCollector.res       = model.G.nx; % X and Y resolution of light collector in pixels, only used for finite f
 
-model.MC.depositionCriteria.onlyCollected = false;
+model.MC.depositionCriteria.onlyCollected = true;
 
 
 
@@ -43,7 +43,7 @@ fluence = model.MC.normalizedFluenceRate(:,:,:);
 transmittance = model.MC.normalizedIrradiance_zpos;
 reflectance = model.MC.normalizedIrradiance_zneg;
 image = model.MC.lightCollector.image;
-name = strcat('outputs/ppg',string(winkel),'deg',string(model.MC.wavelength),'um',roughness_type,'.mat');
+name = strcat('outputs/ppg/',string(winkel),'deg',string(model.MC.wavelength),'um',string(roughness_type),'.mat');
 save(name,'fluence','transmittance','reflectance','image');
 %MCmatlab.plotAzFz(model1);
 

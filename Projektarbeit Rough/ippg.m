@@ -5,7 +5,7 @@ function ippg(winkel, model,roughness_type)
 
 model.MC.lightSource.sourceType   = 2; % 5: X/Y factorizable beam (e.g., a rectangular LED emitter)
 
-model.MC.lightSource.theta     = 0; % [rad] Polar angle of direction the light collector is facing
+model.MC.lightSource.theta     = (winkel*2*pi)/360; % [rad] Polar angle of direction the light collector is facing
 model.MC.lightSource.phi       = 0; % [rad] Azimuthal angle of direction the light collector is facing
 
 model.MC.useLightCollector        = true;
@@ -23,7 +23,7 @@ model.MC.lightCollector.fieldSize = model.G.Lx; % [cm] Field Size of the imaging
 
 model.MC.lightCollector.res       = model.G.nx; % X and Y resolution of light collector in pixels, only used for finite f
 
-model.MC.depositionCriteria.onlyCollected = false;
+model.MC.depositionCriteria.onlyCollected = true;
 
 
 
@@ -33,7 +33,7 @@ fluence = model.MC.normalizedFluenceRate(:,:,:);
 transmittance = model.MC.normalizedIrradiance_zpos;
 reflectance = model.MC.normalizedIrradiance_zneg;
 image = model.MC.lightCollector.image;
-name = strcat('outputs/ippg/',string(winkel),'deg',string(model.MC.wavelength),'um',roughness_type,'.mat');
+name = strcat('outputs/ippg/',string(winkel),'deg',string(model.MC.wavelength),'um',string(roughness_type),'.mat');
 save(name,'fluence','transmittance','reflectance','image');
 %MCmatlab.plotAzFz(model1);
 

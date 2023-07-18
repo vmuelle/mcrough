@@ -89,8 +89,8 @@ function im = roughness(type,intersection,dimxy,mean)
         %im([1, 200],:) = 0;
         %im(:,[1, 200]) = 0;
         im = im.*10e-5;
-        figure
-        mesh(im);
+        %figure
+        %mesh(im);
     
     
     elseif (type == 3)%sinus
