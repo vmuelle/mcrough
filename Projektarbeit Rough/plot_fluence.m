@@ -1,6 +1,11 @@
-function PD = plot_fluence()
-    fluence = load('outputs\ppg\15deg470um4.mat','fluence');
+function PD = plot_fluence(sensor_type,angle,nm,roughness_type)
+
+    PLOTON = true;
+
+    fluence = load(sprintf('outputs/%s/%ddeg%dum%d.mat',sensor_type,angle,nm,roughness_type),'fluence');
     fluence = fluence.fluence;
+    geometry = load(sprintf('outputs/%s/%ddeg%dum%d.mat',sensor_type,angle,nm,roughness_type),'geometry');
+    fluence(geometry == 1) = 0;
     flux = zeros([size(fluence,2),size(fluence,3)]);
     for i = 1:size(fluence,3)
         for j = 1:size(fluence,2)
@@ -8,11 +13,12 @@ function PD = plot_fluence()
         end
     end
     flux = flux./max(max(flux));
-    flux_plt = rot90(rot90(rot90((flux))));
-    figure
-    colormap("hot")
-    imshow(flux_plt);
-    
+    if(PLOTON)
+        flux_plt = rot90(rot90(rot90((flux))));
+        figure
+        colormap("hot")
+        imshow(flux_plt);
+    end
     
     sum_flux = sum(sum(flux));
     sum_flux_i = 0;

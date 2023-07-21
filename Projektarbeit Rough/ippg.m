@@ -33,8 +33,9 @@ fluence = model.MC.normalizedFluenceRate(:,:,:);
 transmittance = model.MC.normalizedIrradiance_zpos;
 reflectance = model.MC.normalizedIrradiance_zneg;
 image = model.MC.lightCollector.image;
+geometry = model.G.M_raw;
 name = strcat('outputs/ippg/',string(winkel),'deg',string(model.MC.wavelength),'um',string(roughness_type),'.mat');
-save(name,'fluence','transmittance','reflectance','image');
+save(name,'fluence','transmittance','reflectance','image','geometry');
 %MCmatlab.plotAzFz(model1);
 
 end
