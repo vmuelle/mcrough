@@ -5,6 +5,7 @@ function PD = plot_fluence(sensor_type,angle,nm,roughness_type)
     fluence = load(sprintf('outputs/%s/%ddeg%dum%d.mat',sensor_type,angle,nm,roughness_type),'fluence');
     fluence = fluence.fluence;
     geometry = load(sprintf('outputs/%s/%ddeg%dum%d.mat',sensor_type,angle,nm,roughness_type),'geometry');
+    geometry = geometry.geometry;
     fluence(geometry == 1) = 0;
     flux = zeros([size(fluence,2),size(fluence,3)]);
     for i = 1:size(fluence,3)
