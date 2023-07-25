@@ -20,6 +20,24 @@ function PD = plot_fluence(sensor_type,angle,nm,roughness_type)
         colormap("hot")
         imshow(flux_plt);
     end
+    z = linspace(0,0.53,1000)';
+    fl = zeros(length(z),1);
+    for i=1:length(z)
+        fl(i,1) = sum(flux(:,i),'all');
+    end
+    
+    % Normierung auf maximale Fluencerate
+    fluence_max = max(fl);
+    fluence_norm = fl./fluence_max;
+    
+    if(PLOTON)
+    % Plot
+    plot(z*10,fluence_norm);
+    xlabel('Hauttiefe in mm');
+    ylabel('a.u.');
+    grid minor;
+    end
+    
     
     sum_flux = sum(sum(flux));
     sum_flux_i = 0;
