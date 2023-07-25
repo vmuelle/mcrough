@@ -23,12 +23,13 @@ model.MC.lightCollector.fieldSize = model.G.Lx; % [cm] Field Size of the imaging
 
 model.MC.lightCollector.res       = model.G.nx; % X and Y resolution of light collector in pixels, only used for finite f
 
-model.MC.depositionCriteria.onlyCollected = true;
+model.MC.depositionCriteria.onlyCollected = false;
 
-
-
+% Simulation
 model = runMonteCarlo(model);
 model = plot(model,'MC');
+
+% Speichern
 fluence = model.MC.normalizedFluenceRate(:,:,:);
 transmittance = model.MC.normalizedIrradiance_zpos;
 reflectance = model.MC.normalizedIrradiance_zneg;

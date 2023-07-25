@@ -1,12 +1,15 @@
 function PD = plot_fluence(sensor_type,angle,nm,roughness_type)
 
     PLOTON = true;
-
+    
+    % Laden der Daten
     fluence = load(sprintf('outputs/%s/%ddeg%dum%d.mat',sensor_type,angle,nm,roughness_type),'fluence');
     fluence = fluence.fluence;
     geometry = load(sprintf('outputs/%s/%ddeg%dum%d.mat',sensor_type,angle,nm,roughness_type),'geometry');
     geometry = geometry.geometry;
     fluence(geometry == 1) = 0;
+    
+    % Berechnung Flux(2D)
     flux = zeros([size(fluence,2),size(fluence,3)]);
     for i = 1:size(fluence,3)
         for j = 1:size(fluence,2)
@@ -20,25 +23,23 @@ function PD = plot_fluence(sensor_type,angle,nm,roughness_type)
         colormap("hot")
         imshow(flux_plt);
     end
+
+    % Brechnung Fluence(1D)
     z = linspace(0,0.53,1000)';
     fl = zeros(length(z),1);
     for i=1:length(z)
         fl(i,1) = sum(flux(:,i),'all');
     end
-    
-    % Normierung auf maximale Fluencerate
-    fluence_max = max(fl);
-    fluence_norm = fl./fluence_max;
-    
+    fluence_norm = fl./max(fl);
     if(PLOTON)
-    % Plot
-    plot(z*10,fluence_norm);
-    xlabel('Hauttiefe in mm');
-    ylabel('a.u.');
-    grid minor;
+        % Plot
+        plot(z*10,fluence_norm);
+        xlabel('Hauttiefe in mm');
+        ylabel('a.u.');
+        grid minor;
     end
     
-    
+    % Berechnung Penetration Depth
     sum_flux = sum(sum(flux));
     sum_flux_i = 0;
     for i = 1:size(flux,2)
