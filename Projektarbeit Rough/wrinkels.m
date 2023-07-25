@@ -1,3 +1,4 @@
+close all
 spLIB = load('spectralLIBskin.mat');
 model1 = MCmatlab.model;
 model1.G.nx                = 400; % Number of bins in the x direction
@@ -23,17 +24,15 @@ nm = 1;
 model1.G.geomFuncParams = {roughness_type};
 model1.G.mediaPropParams =  {spLIB,nm};
 
-model1.G.geomFunc          = @geometryDefinition; % Function to use for defining the distribution of media in the cuboid.
-for nm = 1:length(spLIB.nmLIB)
-    model1.G.mediaPropertiesFunc = @mediaPropertiesFunc; % Media properties defined as a function at the end of this file
-    
-    model1 = plot(model1,'G');
-    for winkel = 0:10:90
-        ppg(winkel,model1);
-        ippg(winkel,model1);
-    end
-end
 
+model1.G.geomFunc          = @geometryDefinition; % Function to use for defining the distribution of media in the cuboid.
+model1.MC.wavelength         = spLIB.nmLIB(nm); % Excitation wavelength in nm, used for determination of optical properties for excitation light
+model1.G.mediaPropertiesFunc = @mediaPropertiesFunc; % Media properties defined as a function at the end of this file
+        
+model1 = plot(model1,'G');
+for winkel = 0:5:45
+    ippg_wrinkels(winkel,model1,roughness_type);
+end
 %% Geometry function(s) (see readme for details)
 % A geometry function takes as input X,Y,Z matrices as returned by the
 % "ndgrid" MATLAB function as well as any parameters the user may have
@@ -51,6 +50,7 @@ function M = geometryDefinition(X,Y,Z,parameters)
     RD_thick = 0.15;
     Hypo_thick = 0.1;
     Muskel_thick = 0.225;
+    wrinkel_depth_val = 0.1;
 
     dimxy = size(X,1); 
     
@@ -74,13 +74,29 @@ function M = geometryDefinition(X,Y,Z,parameters)
 %     hold off
 
     M = ones(size(X)); % air
-    M(Z > roughness(parameters{1},1,dimxy,zsurf*1e4)) = 2; % stratum corneum
-    M(Z > roughness(parameters{1},2,dimxy,zsurf*1e4+SC_thick*1e4)) = 3;
-    M(Z > roughness(parameters{1},3,dimxy,zsurf*1e4+SC_thick*1e4+LE_thick+1e4)) = 4;
-    M(Z > (zsurf+SC_thick+LE_thick+PD_thick)) = 5;
-    M(Z > (zsurf+SC_thick+LE_thick+PD_thick+RD_thick)) = 6;
-    M(Z > (zsurf+SC_thick+LE_thick+PD_thick+RD_thick+Hypo_thick)) = 7;
+    im1 = wrinkel_depth(wrinkel_depth_val,dimxy);
+    im2 = roughness(parameters{1},1,dimxy,zsurf*1e4);
+    im2 = im2+im1;
+    M(Z > im2) = 2; % stratum corneum
+    im3 = roughness(parameters{1},2,dimxy,zsurf*1e4+SC_thick*1e4);
+    im3 = im3+im1;
+    M(Z > im3) = 3;
+    im4 = roughness(parameters{1},3,dimxy,zsurf*1e4+SC_thick*1e4+LE_thick*1e4);
+    im4 = im4+im1;
+    M(Z > im4) = 4;
+    im5 = ones(dimxy,dimxy).*(zsurf+SC_thick+LE_thick+PD_thick);
+    im5 = im5+im1;
+    M(Z > im5) = 5;
+    im6 = ones(dimxy,dimxy).*(zsurf+SC_thick+LE_thick+PD_thick+RD_thick);
+    im6 = im6+im1;
+    M(Z > im6) = 6;
+    im7 = ones(dimxy,dimxy).*(zsurf+SC_thick+LE_thick+PD_thick+RD_thick+Hypo_thick);
+    im7 = im7+im1;
+    M(Z > im7) = 7;
     M(Z > (zsurf+SC_thick+LE_thick+PD_thick+RD_thick+Hypo_thick+Muskel_thick)) = 8;
+    %M(Z < wrinkel_depth(wrinkel_depth_val,dimxy,zsurf)) = 1;
+    figure
+    mesh(im6);
 end
 
 %% Media Properties function (see readme for details)
@@ -161,5 +177,59 @@ function mediaProperties = mediaPropertiesFunc(parameters)
   mediaProperties(j).mus   = lib.mus_knochen(i);  % Scattering coefficient in cm^-1
   mediaProperties(j).g     = lib.g_knochen(i);  % Henyey-Greenstein scattering anisotropy
   mediaProperties(j).n     = lib.n_knochen(i);  % Refractive index
+
+end
+
+function im = wrinkel_depth(depth,dimxy,mean)
+
+    im = zeros(dimxy,dimxy);
+    transly = dimxy/2;
+    x = linspace(1,dimxy,dimxy);
+    y = ones(dimxy).*transly;
+    
+    im(x,y) = 50;
+    std = 20;
+    im = imgaussfilt(im,std,"FilterSize",[101,101]);
+    im = im.*depth;
+
+    %figure
+    %mesh(im);
+  
+end
+
+function ippg_wrinkels(winkel, model,roughness_type)
+
+model.MC.lightSource.sourceType   = 2; % 5: X/Y factorizable beam (e.g., a rectangular LED emitter)
+
+model.MC.lightSource.theta     = (winkel*2*pi)/360; % [rad] Polar angle of direction the light collector is facing
+model.MC.lightSource.phi       = 0; % [rad] Azimuthal angle of direction the light collector is facing
+
+model.MC.useLightCollector        = true;
+model.MC.lightCollector.x         = 0; % [cm] x position of either the center of the objective lens focal plane or the fiber tip
+model.MC.lightCollector.y         = 0; % [cm] y position
+model.MC.lightCollector.z         = 0; % [cm] z position
+
+model.MC.lightCollector.theta     = (winkel*2*pi)/360; % [rad] Polar angle of direction the light collector is facing
+model.MC.lightCollector.phi       = 0; % [rad] Azimuthal angle of direction the light collector is facing
+
+model.MC.lightCollector.f         = 0.52; % [cm] Focal length of the objective lens (if light collector is a fiber, set this to Inf).
+model.MC.lightCollector.diam      = 0.87; % [cm] Diameter of the light collector aperture. For an ideal thin lens, this is 2*f*tan(asin(NA)).
+model.MC.lightCollector.fieldSize = model.G.Lx; % [cm] Field Size of the imaging system (diameter of area in object plane that gets imaged). Only used for finite f.
+%model.MC.lightCollector.NA        = 0.22; % [-] Fiber NA. Only used for infinite f.
+
+model.MC.lightCollector.res       = model.G.nx; % X and Y resolution of light collector in pixels, only used for finite f
+
+model.MC.depositionCriteria.onlyCollected = true;
+
+model = runMonteCarlo(model);
+model = plot(model,'MC');
+fluence = model.MC.normalizedFluenceRate(:,:,:);
+transmittance = model.MC.normalizedIrradiance_zpos;
+reflectance = model.MC.normalizedIrradiance_zneg;
+image = model.MC.lightCollector.image;
+geometry = model.G.M_raw;
+name = strcat('outputs/ippg/',string(winkel),'deg',string(model.MC.wavelength),'um',string(roughness_type),'wrinkels.mat');
+save(name,'fluence','transmittance','reflectance','image','geometry');
+%MCmatlab.plotAzFz(model1);
 
 end
