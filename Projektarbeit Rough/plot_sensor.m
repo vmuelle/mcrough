@@ -16,6 +16,7 @@ function plot_sensor(roughness_type,sensor_type)
     nmLib = nmLib.nmLIB;
     angle = [0,5,10,15,20,25,30,35,40,45];
     
+    figure
     for nm = nmLib
         intensity = zeros(length(angle),1);
         i = 1;
@@ -28,10 +29,13 @@ function plot_sensor(roughness_type,sensor_type)
             intensity(i) = sum(sum(sensor_image));
             i = i+1;
         end
-        figure
-        plot(angle,intensity);
+        hold on
+        plot(angle,intensity,'DisplayName',num2str(nm));
+        set(gca,'YDir','reverse');
+        legend;
         xlabel('polar angle of the source (deg)')
         ylabel('detected energy');
-        title(sprintf('Detected energy for %s with changing angle with light at %d nm',sensor_type,nm));
+        title(sprintf('Detected energy for %s with changing angle',sensor_type));
     end
+    hold off
 end

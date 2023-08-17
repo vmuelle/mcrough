@@ -1,6 +1,6 @@
 function PD = plot_fluence(sensor_type,angle,nm,roughness_type)
 
-    PLOTON = true;
+    PLOTON = false;
     
     % Laden der Daten
     fluence = load(sprintf('outputs/%s/%ddeg%dum%d.mat',sensor_type,angle,nm,roughness_type),'fluence');
@@ -33,6 +33,7 @@ function PD = plot_fluence(sensor_type,angle,nm,roughness_type)
     fluence_norm = fl./max(fl);
     if(PLOTON)
         % Plot
+        figure
         plot(z*10,fluence_norm);
         xlabel('Hauttiefe in mm');
         ylabel('a.u.');
