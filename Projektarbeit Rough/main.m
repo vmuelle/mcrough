@@ -18,11 +18,18 @@ model1.MC.smoothingLengthScale     = model1.G.Lx*10;
 model1.MC.boundaryType             = 1; % 1: All cuboid boundaries are escaping
 model1.MC.wavelength               = 470; % Excitation wavelength in nm, used for determination of optical properties for excitation light
 
-roughness_type = 2;
-nm = 1;
-
-
-
+% roughness_type = 2;
+% nm = 1;
+% winkel = 45;
+% 
+% model1.G.geomFuncParams = {roughness_type};
+% model1.G.geomFunc          = @geometryDefinition; % Function to use for defining the distribution of media in the cuboid.
+% model1.G.mediaPropParams =  {spLIB,nm};
+% model1.MC.wavelength         = spLIB.nmLIB(nm); % Excitation wavelength in nm, used for determination of optical properties for excitation light
+% model1.G.mediaPropertiesFunc = @mediaPropertiesFunc; % Media properties defined as a function at the end of this file
+% model1 = plot(model1,'G');
+% %ppg(winkel,model1,roughness_type);
+% ippg(winkel,model1,roughness_type);
 
 for roughness_type = 1:4
     model1.G.geomFuncParams = {roughness_type};
@@ -67,10 +74,10 @@ function M = geometryDefinition(X,Y,Z,parameters)
 %     Y = Y-0.25;
 % 
 %     figure
-%     mesh(X,Y,im1,'FaceColor','red','DisplayName','Oberfläche','EdgeColor',[0.7,0.7,0.7]);
+%     mesh(X,Y,im1,'FaceColor',[0.2,0.2,0.2],'DisplayName','Oberfläche','EdgeColor',[0.8500 0.3250 0.0980]);
 %     hold on
-%     mesh(X,Y,im2,'FaceColor','blue','DisplayName','SC-LE Übergang','EdgeColor',[0.7,0.7,0.7]);
-%     mesh(X,Y,im3,'FaceColor','green','DisplayName','LE-PD Übergang','EdgeColor',[0.7,0.7,0.7]);
+%     mesh(X,Y,im2,'FaceColor',[0.2,0.2,0.2],'DisplayName','SC-LE Übergang','EdgeColor',[0 0.4470 0.7410]);
+%     mesh(X,Y,im3,'FaceColor',[0.2,0.2,0.2],'DisplayName','LE-PD Übergang','EdgeColor',[0.4660 0.6740 0.1880]);
 %     xlabel('X(cm)')
 %     ylabel('Y(cm)')
 %     zlabel('Z(cm)')

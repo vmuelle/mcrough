@@ -21,18 +21,30 @@ model1.MC.wavelength               = 470; % Excitation wavelength in nm, used fo
 
 roughness_type = 2;
 nm = 1;
-model1.G.geomFuncParams = {roughness_type};
-model1.G.mediaPropParams =  {spLIB,nm};
 
-
-model1.G.geomFunc          = @geometryDefinition; % Function to use for defining the distribution of media in the cuboid.
 model1.MC.wavelength         = spLIB.nmLIB(nm); % Excitation wavelength in nm, used for determination of optical properties for excitation light
-model1.G.mediaPropertiesFunc = @mediaPropertiesFunc; % Media properties defined as a function at the end of this file
+
         
-model1 = plot(model1,'G');
+% 
+% model1.G.geomFuncParams = {roughness_type,0.04};
+% model1.G.geomFunc = @geometryDefinition;
+% model1.G.mediaPropParams = {spLIB,nm};
+% model1.G.mediaPropertiesFunc = @mediaPropertiesFunc; % Media properties defined as a function at the end of this file
+% model1 = plot(model1,'G');
+% ippg_wrinkels(45,model1,roughness_type,0.04);
+
+
 for winkel = 0:5:45
-    ippg_wrinkels(winkel,model1,roughness_type);
+    for depth = 0:0.02:0.1
+        model1.G.geomFuncParams = {roughness_type,depth};
+        model1.G.geomFunc = @geometryDefinition;
+        model1.G.mediaPropParams = {spLIB,nm};
+        model1.G.mediaPropertiesFunc = @mediaPropertiesFunc; % Media properties defined as a function at the end of this file
+        model1 = plot(model1,'G');
+        ippg_wrinkels(winkel,model1,roughness_type,depth);
+    end
 end
+
 %% Geometry function(s) (see readme for details)
 % A geometry function takes as input X,Y,Z matrices as returned by the
 % "ndgrid" MATLAB function as well as any parameters the user may have
@@ -50,7 +62,7 @@ function M = geometryDefinition(X,Y,Z,parameters)
     RD_thick = 0.15;
     Hypo_thick = 0.1;
     Muskel_thick = 0.225;
-    wrinkel_depth_val = 0.1;
+    wrinkel_depth_val = parameters{2};
 
     dimxy = size(X,1); 
     
@@ -180,24 +192,24 @@ function mediaProperties = mediaPropertiesFunc(parameters)
 
 end
 
-function im = wrinkel_depth(depth,dimxy,mean)
+function im = wrinkel_depth(depth,dimxy)
 
     im = zeros(dimxy,dimxy);
     transly = dimxy/2;
-    x = linspace(1,dimxy,dimxy);
-    y = ones(dimxy).*transly;
+    y = linspace(1,dimxy,dimxy);
+    x = ones(dimxy).*transly;
     
     im(x,y) = 50;
     std = 20;
     im = imgaussfilt(im,std,"FilterSize",[101,101]);
     im = im.*depth;
 
-    %figure
-    %mesh(im);
+    figure
+    mesh(im);
   
 end
 
-function ippg_wrinkels(winkel, model,roughness_type)
+function ippg_wrinkels(winkel, model,roughness_type,depth)
 
 model.MC.lightSource.sourceType   = 2; % 5: X/Y factorizable beam (e.g., a rectangular LED emitter)
 
@@ -228,7 +240,7 @@ transmittance = model.MC.normalizedIrradiance_zpos;
 reflectance = model.MC.normalizedIrradiance_zneg;
 image = model.MC.lightCollector.image;
 geometry = model.G.M_raw;
-name = strcat('outputs/ippg/',string(winkel),'deg',string(model.MC.wavelength),'um',string(roughness_type),'wrinkels.mat');
+name = strcat('outputs/ippg/',string(winkel),'deg',string(model.MC.wavelength),'um',string(roughness_type),'_',string(depth),'wrinkels.mat');
 save(name,'fluence','transmittance','reflectance','image','geometry');
 %MCmatlab.plotAzFz(model1);
 

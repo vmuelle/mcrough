@@ -1,6 +1,6 @@
 function PD = plot_fluence(sensor_type,angle,nm,roughness_type)
 
-    PLOTON = false;
+    PLOTON = true;
     
     % Laden der Daten
     fluence = load(sprintf('outputs/%s/%ddeg%dum%d.mat',sensor_type,angle,nm,roughness_type),'fluence');
